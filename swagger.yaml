@@ -1,0 +1,81 @@
+openapi: 3.0.0
+info:
+  title: API mock by Prism
+  description: |
+    Prism で OnDemand API mock を構築する  
+    - 通常の Prism の前にプロキシを挟んで、  
+      リクエスト内容に応じて Prefer: example=xxxxx を生成する。
+  version: 1.0.0
+tags:
+  - name: Sample API
+    description: サンプル
+servers:
+  - url: http://localhost:4011
+    description: 開発環境
+paths:
+  /sampleApi:
+    post:
+      tags:
+        - Sample API
+      description: |
+        mode パラメーターによりレスポンスを変える
+      parameters:
+        - name: cache
+          in: header
+          schema:
+            type: string
+          required: false
+          example: no-cache
+        - name: Prefer
+          in: header
+          schema:
+            type: string
+          required: false
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/sampleApi"
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/sampleApiResponse"
+              examples:
+                modeA:
+                  $ref: "#/components/examples/modeA"
+                modeB:
+                  $ref: "#/components/examples/modeB"
+                modeC:
+                  $ref: "#/components/examples/modeC"
+components:
+  schemas:
+    sampleApi:
+      description: 送信データ
+      type: object
+      properties:
+        mode:
+          description: 振り分け対象のモード
+          type: string
+          example: modeA
+    sampleApiResponse:
+      description: 結果データ
+      type: object
+      properties:
+        result:
+          type: string
+  examples:
+    modeA:
+      summary: modeA
+      value:
+        result: modeAresult
+    modeB:
+      summary: modeB
+      value:
+        result: modeBresult
+    modeC:
+      summary: modeC
+      value:
+        result: modeCresult
