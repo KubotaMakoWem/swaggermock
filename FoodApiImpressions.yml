@@ -1,0 +1,187 @@
+openapi: 3.0.0
+info:
+  title: CuruRucu FOOD 閲覧回数管理 API (FoodApiImpressions)
+  description: CuruRucu FOOD の閲覧回数管理を API 化
+  version: 0.0.1
+servers:
+  - url: http://localhost:22221
+    description: ローカル環境(prism)
+  - url: http://localhost:22222
+    description: ローカル環境(proxy)
+  # - url: https://cururucu.xsrv.jp/develop/food/v1
+  #   description: 開発環境
+  # - url: https://cururucu.xsrv.jp/staging/food/v1
+  #   description: 検証環境
+  # - url: https://cururucu.xsrv.jp/food/v1
+  #   description: 本番環境
+paths:
+  /impressions:
+    post:
+      tags:
+        - FoodApiImpressions
+      summary: 閲覧回数登録
+      description: appやwebで、投稿や店舗詳細が閲覧される度に日時を記録
+      operationId: SaveImpression
+      parameters:
+        - $ref: "#/components/parameters/Cache-Control"
+        - $ref: "#/components/parameters/Prefer"
+      requestBody:
+        description: FoodApiSaveImpressionRequest
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/FoodApiSaveImpressionRequest"
+            examples:
+              FoodApiSaveImpressionRequest200AppPost:
+                $ref: "#/components/examples/FoodApiSaveImpressionRequest200AppPost"
+              FoodApiSaveImpressionRequest200AppBiz:
+                $ref: "#/components/examples/FoodApiSaveImpressionRequest200AppBiz"
+              FoodApiSaveImpressionRequest200WebPost:
+                $ref: "#/components/examples/FoodApiSaveImpressionRequest200WebPost"
+              FoodApiSaveImpressionRequest200WebBiz:
+                $ref: "#/components/examples/FoodApiSaveImpressionRequest200WebBiz"
+              FoodApiSaveImpressionRequest400AppPost:
+                $ref: "#/components/examples/FoodApiSaveImpressionRequest400AppPost"
+              FoodApiSaveImpressionRequest400AppBiz:
+                $ref: "#/components/examples/FoodApiSaveImpressionRequest400AppBiz"
+              FoodApiSaveImpressionRequest400WebPost:
+                $ref: "#/components/examples/FoodApiSaveImpressionRequest400WebPost"
+              FoodApiSaveImpressionRequest400WebBiz:
+                $ref: "#/components/examples/FoodApiSaveImpressionRequest400WebBiz"
+      responses:
+        200:
+          description: HTTP Status 200 OK.
+        400:
+          description: HTTP Status 400 Bad Request.
+        500:
+          description: HTTP Status 500 Server Error.
+components:
+  schemas:
+    FoodApiImpressions:
+      title: FoodApiImpressions
+      description: impression履歴
+      properties:
+        id:
+          description: id
+          type: integer
+          format: int64
+          example: 0
+          nullable: false
+        uid:
+          description: postUid|bizUid
+          type: string
+          example: 123456789012345678_xxxxxxxxxxxxxxxxxxxx
+          nullable: false
+        subject:
+          description: post|biz
+          type: string
+          example: post|biz
+          nullable: false
+        media:
+          description: app|web
+          type: string
+          example: app|web
+          nullable: false
+        impressionedAt:
+          description: 閲覧日時(UTC)
+          type: string
+          example: 2023-12-31T12:34:56.789Z
+          nullable: false
+        updatedAt:
+          description: 最終更新日時(UTC)
+          type: string
+          example: 2023-12-31T12:34:56.789Z
+          nullable: false
+      type: object
+    FoodApiSaveImpressionRequest:
+      title: FoodApiSaveImpressionRequest
+      description: 投稿閲覧回数登録
+      required:
+        - uids
+        - subject
+        - media
+      properties:
+        uids:
+          description: postUid|bizUidの配列
+          type: array
+          items:
+            $ref: "#/components/schemas/FoodApiImpressions/properties/uid"
+        subject:
+          $ref: "#/components/schemas/FoodApiImpressions/properties/subject"
+        media:
+          $ref: "#/components/schemas/FoodApiImpressions/properties/media"
+      type: object
+  parameters:
+    Cache-Control:
+      name: Cache-Control
+      in: header
+      required: false
+      schema:
+        description: キャッシュ指定（ブラウザ・経路・CDN）
+        type: string
+        example: no-cache
+    Prefer:
+      name: Prefer
+      in: header
+      schema:
+        type: string
+      required: false
+  examples:
+    FoodApiSaveImpressionRequest200AppPost:
+      summary: アプリ投稿複数：200
+      value:
+        uids:
+          - 999999999999999999_xxxxxxxx200AppPost01
+          - 999999999999999999_xxxxxxxx200AppPost02
+          - 999999999999999999_xxxxxxxx200AppPost03
+          - 999999999999999999_xxxxxxxx200AppPost04
+          - 999999999999999999_xxxxxxxx200AppPost05
+        subject: post
+        media: app
+    FoodApiSaveImpressionRequest200AppBiz:
+      summary: アプリ店舗詳細：200
+      value:
+        uids:
+          - xxxxxxxxx200AppBiz01
+        subject: biz
+        media: app
+    FoodApiSaveImpressionRequest200WebPost:
+      summary: ウェブ投稿：200
+      value:
+        uids:
+          - 999999999999999999_xxxxxxxx200WebPost01
+        subject: post
+        media: web
+    FoodApiSaveImpressionRequest200WebBiz:
+      summary: ウェブ店舗詳細：200
+      value:
+        uids:
+          - xxxxxxxxx200WebBiz01
+        subject: biz
+        media: web
+    FoodApiSaveImpressionRequest400AppPost:
+      summary: アプリ投稿複数：400（uid0件）
+      value:
+        uids: []
+        subject: post
+        media: app
+    FoodApiSaveImpressionRequest400AppBiz:
+      summary: アプリ店舗詳細：400（uidなし）
+      value:
+        subject: biz
+        media: app
+    FoodApiSaveImpressionRequest400WebPost:
+      summary: ウェブ投稿：400（subjectなし）
+      value:
+        uids:
+          - 999999999999999999_xxxxxxxx400WebPost01
+        media: web
+    FoodApiSaveImpressionRequest400WebBiz:
+      summary: ウェブ店舗詳細：400（mediaなし）
+      value:
+        uids:
+          - xxxxxxxxx400WebBiz01
+        subject: biz
+tags:
+  - name: FoodApiImpressions
+    description: 投稿などの閲覧回数を管理する API 群

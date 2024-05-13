@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "express": "ts-node express.ts",
-    "prism": "prism mock swagger.yaml"
+    "prism": "prism mock --host localhost --port 22221 FoodApiImpressions.yml"
   },
   "author": "",
   "license": "ISC",
