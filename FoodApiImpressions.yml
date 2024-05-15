@@ -55,6 +55,71 @@ paths:
           description: HTTP Status 400 Bad Request.
         500:
           description: HTTP Status 500 Server Error.
+  /impressions/count:
+    post:
+      tags:
+        - FoodApiImpressions
+      summary: 閲覧回数取得
+      description: appやwebで、投稿や店舗詳細が閲覧された回数を取得
+      operationId: GetImpressionCount
+      parameters:
+        - $ref: "#/components/parameters/Cache-Control"
+        - $ref: "#/components/parameters/Prefer"
+      requestBody:
+        description: FoodApiImpressionCountRequest
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/FoodApiGetImpressionCountRequest"
+            examples:
+              FoodApiGetImpressionCountRequest200ByMediaNonePost:
+                $ref: "#/components/examples/FoodApiGetImpressionCountRequest200ByMediaNonePost"
+              FoodApiGetImpressionCountRequest200ByMediaNonePostMultiple:
+                $ref: "#/components/examples/FoodApiGetImpressionCountRequest200ByMediaNonePostMultiple"
+              FoodApiGetImpressionCountRequest200ByMediaFalsePost:
+                $ref: "#/components/examples/FoodApiGetImpressionCountRequest200ByMediaFalsePost"
+              FoodApiGetImpressionCountRequest200ByMediaTruePost:
+                $ref: "#/components/examples/FoodApiGetImpressionCountRequest200ByMediaTruePost"
+              FoodApiGetImpressionCountRequest200ByMediaNoneBiz:
+                $ref: "#/components/examples/FoodApiGetImpressionCountRequest200ByMediaNoneBiz"
+              FoodApiGetImpressionCountRequest200ByMediaFalseBiz:
+                $ref: "#/components/examples/FoodApiGetImpressionCountRequest200ByMediaFalseBiz"
+              FoodApiGetImpressionCountRequest200ByMediaTrueBiz:
+                $ref: "#/components/examples/FoodApiGetImpressionCountRequest200ByMediaTrueBiz"
+              FoodApiGetImpressionCountRequest400UidsEmpty:
+                $ref: "#/components/examples/FoodApiGetImpressionCountRequest400UidsEmpty"
+              FoodApiGetImpressionCountRequest400UidsNone:
+                $ref: "#/components/examples/FoodApiGetImpressionCountRequest400UidsNone"
+
+      responses:
+        200:
+          description: HTTP Status 200 OK.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/FoodApiImpression"
+              examples:
+                FoodApiImpression200ByMediaNonePost:
+                  $ref: "#/components/examples/FoodApiImpression200ByMediaNonePost"
+                FoodApiImpression200ByMediaNonePostMultiple:
+                  $ref: "#/components/examples/FoodApiImpression200ByMediaNonePostMultiple"
+                FoodApiImpression200ByMediaFalsePost:
+                  $ref: "#/components/examples/FoodApiImpression200ByMediaFalsePost"
+                FoodApiImpression200ByMediaTruePost:
+                  $ref: "#/components/examples/FoodApiImpression200ByMediaTruePost"
+                FoodApiImpression200ByMediaNoneBiz:
+                  $ref: "#/components/examples/FoodApiImpression200ByMediaNoneBiz"
+                FoodApiImpression200ByMediaFalseBiz:
+                  $ref: "#/components/examples/FoodApiImpression200ByMediaFalseBiz"
+                FoodApiImpression200ByMediaTrueBiz:
+                  $ref: "#/components/examples/FoodApiImpression200ByMediaTrueBiz"
+
+        400:
+          description: HTTP Status 400 Bad Request.
+        500:
+          description: HTTP Status 500 Server Error.
 components:
   schemas:
     FoodApiImpressions:
@@ -95,7 +160,7 @@ components:
       type: object
     FoodApiSaveImpressionRequest:
       title: FoodApiSaveImpressionRequest
-      description: 投稿閲覧回数登録
+      description: 閲覧回数登録リクエスト
       required:
         - uids
         - subject
@@ -110,6 +175,40 @@ components:
           $ref: "#/components/schemas/FoodApiImpressions/properties/subject"
         media:
           $ref: "#/components/schemas/FoodApiImpressions/properties/media"
+      type: object
+    FoodApiGetImpressionCountRequest:
+      title: FoodApiGetImpressionCountRequest
+      description: 閲覧回数取得リクエスト
+      required:
+        - uids
+      properties:
+        uids:
+          description: postUid|bizUidの配列
+          type: array
+          items:
+            $ref: "#/components/schemas/FoodApiImpressions/properties/uid"
+        bymedia:
+          description: media毎に集計するかどうか
+          type: boolean
+          example: true
+      type: object
+    FoodApiImpression:
+      title: FoodApiImpression
+      description: 閲覧回数
+      required:
+        - uid
+        - count
+      properties:
+        uid:
+          $ref: "#/components/schemas/FoodApiImpressions/properties/uid"
+        media:
+          $ref: "#/components/schemas/FoodApiImpressions/properties/media"
+        count:
+          description: 閲覧回数
+          type: integer
+          format: int64
+          example: 123
+          nullable: false
       type: object
   parameters:
     Cache-Control:
@@ -182,6 +281,97 @@ components:
         uids:
           - xxxxxxxxx400WebBiz01
         subject: biz
+    # ----------------------------------------------------------------
+    FoodApiGetImpressionCountRequest200ByMediaNonePost:
+      summary: 投稿uid1件/bymedia=なし：200
+      value:
+        uids:
+          - 999999999999999999_xxxxxxxxxxx200Post01
+    FoodApiGetImpressionCountRequest200ByMediaNonePostMultiple:
+      summary: 投稿uid2件/bymedia=なし：200
+      value:
+        uids:
+          - 999999999999999999_xxxxxxxxxxx200Post01
+          - 999999999999999999_xxxxxxxxxxx200Post02
+    FoodApiGetImpressionCountRequest200ByMediaFalsePost:
+      summary: 投稿uid1件/bymedia=false：200
+      value:
+        uids:
+          - 999999999999999999_xxxxxxxxxxx200Post01
+        bymedia: false
+    FoodApiGetImpressionCountRequest200ByMediaTruePost:
+      summary: 投稿uid1件/bymedia=true：200
+      value:
+        uids:
+          - 999999999999999999_xxxxxxxxxxx200Post01
+        bymedia: true
+    FoodApiGetImpressionCountRequest200ByMediaNoneBiz:
+      summary: 店舗uid1件/bymedia=なし：200
+      value:
+        uids:
+          - xxxxxxxxxxxx200Biz01
+    FoodApiGetImpressionCountRequest200ByMediaFalseBiz:
+      summary: 店舗uid1件/bymedia=false：200
+      value:
+        uids:
+          - xxxxxxxxxxxx200Biz01
+        bymedia: false
+    FoodApiGetImpressionCountRequest200ByMediaTrueBiz:
+      summary: 店舗uid1件/bymedia=true：200
+      value:
+        uids:
+          - xxxxxxxxxxxx200Biz01
+        bymedia: true
+    FoodApiGetImpressionCountRequest400UidsEmpty:
+      summary: uid0件：400
+      value:
+        uids: []
+    FoodApiGetImpressionCountRequest400UidsNone:
+      summary: uidなし：400
+      value:
+        bymedia: true
+    # ----------------------------------------------------------------
+    FoodApiImpression200ByMediaNonePost:
+      summary: 投稿uid1件/bymedia=なし：200
+      value: [{ uid: 999999999999999999_xxxxxxxxxxx200Post01, count: 2 }]
+    FoodApiImpression200ByMediaNonePostMultiple:
+      summary: 投稿uid2件/bymedia=なし：200
+      value:
+        [
+          { uid: 999999999999999999_xxxxxxxxxxx200Post01, count: 2 },
+          { uid: 999999999999999999_xxxxxxxxxxx200Post02, count: 2 },
+        ]
+    FoodApiImpression200ByMediaFalsePost:
+      summary: 投稿uid1件/bymedia=false：200
+      value: [{ uid: 999999999999999999_xxxxxxxxxxx200Post01, count: 2 }]
+    FoodApiImpression200ByMediaTruePost:
+      summary: 投稿uid1件/bymedia=true：200
+      value:
+        [
+          {
+            uid: 999999999999999999_xxxxxxxxxxx200Post01,
+            media: app,
+            count: 1,
+          },
+          {
+            uid: 999999999999999999_xxxxxxxxxxx200Post01,
+            media: web,
+            count: 1,
+          },
+        ]
+    FoodApiImpression200ByMediaNoneBiz:
+      summary: 店舗uid1件/bymedia=なし：200
+      value: [{ uid: xxxxxxxxxxxx200Biz01, count: 2 }]
+    FoodApiImpression200ByMediaFalseBiz:
+      summary: 店舗uid1件/bymedia=false：200
+      value: [{ uid: xxxxxxxxxxxx200Biz01, count: 2 }]
+    FoodApiImpression200ByMediaTrueBiz:
+      summary: 店舗uid1件/bymedia=true：200
+      value:
+        [
+          { uid: xxxxxxxxxxxx200Biz01, media: app, count: 1 },
+          { uid: xxxxxxxxxxxx200Biz01, media: web, count: 1 },
+        ]
 tags:
   - name: FoodApiImpressions
     description: 投稿などの閲覧回数を管理する API 群

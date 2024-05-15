@@ -93,3 +93,54 @@ const urlImpressionsProcess = (headers: Headers, body: any): Headers => {
 app.post(urlImpressions,
     async (req: express.Request, res: express.Response) =>
         commonProcess(req, res, urlImpressions, urlImpressionsProcess));
+
+// appやwebで、投稿や店舗詳細が閲覧された回数を取得
+const urlImpressionsCount = '/impressions/count';
+const urlImpressionsCountProcess = (headers: Headers, body: any): Headers => {
+    console.log(body);
+    if ((body['uids'] === undefined) ||
+        (body['uids'].length < 1)) {
+        setCode(headers, 400);
+    } else {
+        if ((body['uids'].length === 1) &&
+            (body['uids'][0] === '999999999999999999_xxxxxxxxxxx200Post01') &&
+            (body['bymedia'] === undefined)) {
+            setExample(headers, 'FoodApiImpression200ByMediaNonePost');
+        }
+        if ((body['uids'].length === 2) &&
+            (body['uids'][0] === '999999999999999999_xxxxxxxxxxx200Post01') &&
+            (body['uids'][1] === '999999999999999999_xxxxxxxxxxx200Post02') &&
+            (body['bymedia'] === undefined)) {
+            setExample(headers, 'FoodApiImpression200ByMediaNonePostMultiple');
+        }
+        if ((body['uids'].length === 1) &&
+            (body['uids'][0] === '999999999999999999_xxxxxxxxxxx200Post01') &&
+            (body['bymedia'] === false)) {
+            setExample(headers, 'FoodApiImpression200ByMediaFalsePost');
+        }
+        if ((body['uids'].length === 1) &&
+            (body['uids'][0] === '999999999999999999_xxxxxxxxxxx200Post01') &&
+            (body['bymedia'] === true)) {
+            setExample(headers, 'FoodApiImpression200ByMediaTruePost');
+        }
+        if ((body['uids'].length === 1) &&
+            (body['uids'][0] === 'xxxxxxxxxxxx200Biz01') &&
+            (body['bymedia'] === undefined)) {
+            setExample(headers, 'FoodApiImpression200ByMediaNoneBiz');
+        }
+        if ((body['uids'].length === 1) &&
+            (body['uids'][0] === 'xxxxxxxxxxxx200Biz01') &&
+            (body['bymedia'] === false)) {
+            setExample(headers, 'FoodApiImpression200ByMediaFalseBiz');
+        }
+        if ((body['uids'].length === 1) &&
+            (body['uids'][0] === 'xxxxxxxxxxxx200Biz01') &&
+            (body['bymedia'] === true)) {
+            setExample(headers, 'FoodApiImpression200ByMediaTrueBiz');
+        }
+    }
+    return headers;
+}
+app.post(urlImpressionsCount,
+    async (req: express.Request, res: express.Response) =>
+        commonProcess(req, res, urlImpressionsCount, urlImpressionsCountProcess));
